@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ -f $HOME/.Xresources ] && xrdb $HOME/.Xresources
+autocutsel -fork
+
+# Ratpoison is compatible with xcompmgr! now you can have real transparency
+xcompmgr -c -f -D 5 &
+
+# Fix to make GNOME work
+export XKL_XMODMAP_DISABLE=1
+
+#fire up ratpoison!
+exec /usr/bin/ratpoison
