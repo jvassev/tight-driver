@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:bionic
 
 EXPOSE 5901 6080 4444
 VOLUME /tmp/.X11-unix
@@ -7,7 +7,7 @@ ENV GEOMETRY=1920x1200 SESSION_NAME=no-name USER=test VNC_PASS=123456
 
 RUN apt-get update
 RUN apt-get -y install tightvncserver x11-apps ratpoison xterm autocutsel
-RUN apt-get -y install unzip curl git net-tools python
+RUN apt-get -y install unzip curl git net-tools python gpg
 
 RUN useradd test -m -s /bin/bash
 
@@ -15,7 +15,9 @@ RUN useradd test -m -s /bin/bash
 RUN mkdir -p /home/test/.vnc && \
     echo "$VNC_PASS" | vncpasswd -f > /home/test/.vnc/passwd && \
     chmod go-rwx /home/test/.vnc/passwd
-RUN git clone https://github.com/kanaka/noVNC.git --depth 1      /home/test/novnc  && \
+RUN git clone https://github.com/kanaka/noVNC.git    /home/test/novnc  && \
+    cd /home/test/novnc && git checkout v1.1.0 && \
+    rm -fr .git && \
     git clone https://github.com/kanaka/websockify.git --depth 1 /home/test/novnc/utils/websockify
 
 ENV TINI_VERSION=v0.9.0
@@ -24,7 +26,7 @@ RUN chmod +x /bin/tini
 
 
 # Install Chrome WebDriver
-ENV CHROMEDRIVER_VERSION=2.24
+ENV CHROMEDRIVER_VERSION=81.0.4044.20
 RUN mkdir -p /opt/chromedriver-$CHROMEDRIVER_VERSION && \
     curl -sS -o /tmp/chromedriver_linux64.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip && \
     unzip /tmp/chromedriver_linux64.zip -d /opt/chromedriver-$CHROMEDRIVER_VERSION && \
